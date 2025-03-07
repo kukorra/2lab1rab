@@ -3,12 +3,13 @@ open System
 // Функция для нахождения максимальной цифры в числе
 let maxchislo (n: int) =
     n.ToString()
-    |> Seq.map (fun c -> int c - int '0')
-    |> Seq.max
+    |> List.ofSeq  // Преобразуем строку в список символов
+    |> List.map (fun c -> int c - int '0')  // Преобразуем символы в цифры
+    |> List.max  // Находим максимальную цифру
 
 // Функция для обработки списка чисел
 let processList (numbers: int list) : int list =
-    numbers |> List.map maxchislo
+    numbers |> List.map maxchislo  // Применяем maxchislo ко всем элементам списка
 
 // Функция для безопасного ввода списка натуральных чисел
 let readNumbers () =
@@ -17,7 +18,7 @@ let readNumbers () =
 
     try
         input.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
-        |> List.ofSeq
+        |> List.ofSeq  // Преобразуем введенную строку в список строк
         |> List.map (fun x -> 
             if x.Contains('.') || x.Contains(',') then 
                 raise (System.FormatException("Число не должно быть дробным!"))
@@ -34,7 +35,7 @@ let readNumbers () =
 // Функция для генерации случайного списка чисел
 let randomchislo (count: int) (min: int) (max: int) =
     let rand = Random()
-    List.init count (fun _ -> rand.Next(min, max + 1))
+    List.init count (fun _ -> rand.Next(min, max + 1))  // Генерация списка случайных чисел
 
 // Основная программа
 [<EntryPoint>]
