@@ -1,22 +1,47 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132 d17.12
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "2lab1rab", "2lab1rab\2lab1rab.fsproj", "{E1AB0896-1A97-4F42-9E01-E67DCDF04DF9}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E1AB0896-1A97-4F42-9E01-E67DCDF04DF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1AB0896-1A97-4F42-9E01-E67DCDF04DF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1AB0896-1A97-4F42-9E01-E67DCDF04DF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1AB0896-1A97-4F42-9E01-E67DCDF04DF9}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-EndGlobal
+open System
+
+// Функция для генерации случайной строки
+let randomstroki (length: int) =
+    let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    // Создаем список случайных символов
+    let randomsimvol = List.init length (fun _ -> chars.[Random().Next(chars.Length)])
+    // Преобразуем список символов в строку, используя List.fold
+    randomsimvol |> List.fold (fun acc ch -> acc + string ch) ""
+
+// Генерация случайного списка строк
+let randomspisokstrok (count: int) =
+    List.init count (fun _ -> randomstroki (Random().Next(5, 11)))
+
+// Функция для подсчета суммарной длины строк в списке
+let totaldlina (strings: string list) =
+    List.sumBy String.length strings
+
+// Ввод строк с клавиатуры (через пробел)
+let vvodsklav () =
+    // Разбиваем строку на отдельные части по пробелу и преобразуем в List
+    Console.ReadLine().Split(' ') |> Seq.toList
+
+// Основная логика программы
+[<EntryPoint>]
+let main argv =
+    // Запрос выбора от пользователя
+    printfn "Выберите способ ввода данных:"
+    printfn "1. Генерация случайных строк"
+    printfn "2. Ввод строк с клавиатуры"
+    printf "Введите 1 или 2: "
+    let choice = Console.ReadLine()
+
+    match choice with
+    | "1" ->
+        // Генерация случайных строк
+        let randomstroka = randomspisokstrok 5
+        randomstroka |> List.iter (printfn "%s")
+        printfn "Суммарная длина случайно сгенерированных строк: %d" (totaldlina randomstroka)
+    | "2" ->
+        // Ввод строк с клавиатуры
+        let inputList = vvodsklav()
+        printfn "Суммарная длина введенных строк: %d" (totaldlina inputList)
+    | _ -> 
+        printfn "Некорректный выбор. Пожалуйста, введите 1 или 2."
+
+    0 // Возвращаем 0, что означает успешное завершение программы
