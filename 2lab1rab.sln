@@ -1,47 +1,71 @@
 open System
 
-// Функция для генерации случайной строки
-let randomstroki (length: int) =
-    let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    // Создаем список случайных символов
-    let randomsimvol = List.init length (fun _ -> chars.[Random().Next(chars.Length)])
-    // Преобразуем список символов в строку, используя List.fold
-    randomsimvol |> List.fold (fun acc ch -> acc + string ch) ""
+// Функция для нахождения максимальной цифры в числе
+let maxchislo (n: int) =
+    n.ToString()
+    |> Seq.map (fun c -> int c - int '0')
+    |> Seq.max
 
-// Генерация случайного списка строк
-let randomspisokstrok (count: int) =
-    List.init count (fun _ -> randomstroki (Random().Next(5, 11)))
+// Функция для обработки списка чисел
+let processList (numbers: int list) : int list =
+    numbers |> List.map maxchislo
 
-// Функция для подсчета суммарной длины строк в списке
-let totaldlina (strings: string list) =
-    List.sumBy String.length strings
+// Функция для безопасного ввода списка натуральных чисел
+let readNumbers () =
+    printfn "Введите натуральные числа через пробел:"
+    let input = Console.ReadLine()
 
-// Ввод строк с клавиатуры (через пробел)
-let vvodsklav () =
-    // Разбиваем строку на отдельные части по пробелу и преобразуем в List
-    Console.ReadLine().Split(' ') |> Seq.toList
+    try
+        input.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
+        |> List.ofSeq
+        |> List.map (fun x -> 
+            if x.Contains('.') || x.Contains(',') then 
+                raise (System.FormatException("Число не должно быть дробным!"))
+            
+            let num = int x
+            if num <= 0 then raise (System.FormatException("Число должно быть натуральным!"))
+            num
+        )
+    with
+    | :? System.FormatException as e -> 
+        printfn "Ошибка: %s" e.Message
+        []  // Возвращаем пустой список вместо повторного ввода
 
-// Основная логика программы
+// Функция для генерации случайного списка чисел
+let randomchislo (count: int) (min: int) (max: int) =
+    let rand = Random()
+    List.init count (fun _ -> rand.Next(min, max + 1))
+
+// Основная программа
 [<EntryPoint>]
 let main argv =
     // Запрос выбора от пользователя
     printfn "Выберите способ ввода данных:"
-    printfn "1. Генерация случайных строк"
-    printfn "2. Ввод строк с клавиатуры"
+    printfn "1. Ввод чисел с клавиатуры"
+    printfn "2. Генерация случайных чисел"
     printf "Введите 1 или 2: "
     let choice = Console.ReadLine()
 
-    match choice with
-    | "1" ->
-        // Генерация случайных строк
-        let randomstroka = randomspisokstrok 5
-        randomstroka |> List.iter (printfn "%s")
-        printfn "Суммарная длина случайно сгенерированных строк: %d" (totaldlina randomstroka)
-    | "2" ->
-        // Ввод строк с клавиатуры
-        let inputList = vvodsklav()
-        printfn "Суммарная длина введенных строк: %d" (totaldlina inputList)
-    | _ -> 
-        printfn "Некорректный выбор. Пожалуйста, введите 1 или 2."
+    let numbers =
+        match choice with
+        | "1" -> 
+            let input = readNumbers()
+            if input.IsEmpty then 
+                printfn "Программа завершена из-за ошибки ввода."
+                exit 1 // Код ошибки
+            else input
+        | "2" -> 
+            printf "Введите количество случайных чисел: "
+            let count = int (Console.ReadLine())
+            printf "Введите минимальное значение: "
+            let min = int (Console.ReadLine())
+            printf "Введите максимальное значение: "
+            let max = int (Console.ReadLine())
+            randomchislo count min max
+        | _ -> 
+            printfn "Некорректный выбор. Программа завершена."
+            exit 1 // Код ошибки
 
-    0 // Возвращаем 0, что означает успешное завершение программы
+    let result = processList numbers
+    printfn "Максимальные цифры в каждом числе: %A" result
+    0  // Код успешного завершения
